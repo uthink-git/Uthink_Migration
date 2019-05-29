@@ -22,7 +22,7 @@ shinyServer(function(input, output) {
   observeEvent(TRUE,
                shinyalert(
                  title = "Information",
-                 text = "Bienvenue à l'application Uthink Migration. Cet outil vous permet de tester vos connaissances et de les confronter directement avec les données de l'OFS. Nous vous invitons à répondre aux deux questions suivantes sans chercher à trouver la \"bonne\" réponse. Il s'agit uniquement de votre intention, il n'y a pas de bonne ou mauvaise réponse.",
+                 text = "Bienvenue sur l'application Uthink Migration.\nCette application vous permet de tester vos connaissances et de les confronter directement avec les données de l'OFS. Nous vous invitons à répondre aux deux questions suivantes sans chercher à trouver la \"bonne\" réponse. Il s'agit uniquement de votre intuition, il n'y a pas de bonne ou mauvaise réponse.",
                  closeOnEsc = FALSE,
                  closeOnClickOutside = FALSE,
                  html = FALSE,
@@ -40,14 +40,14 @@ shinyServer(function(input, output) {
   observeEvent(TRUE, {
       shinyalert(
     title = "Première Question",
-    text = "Quelle est, selon vous, la moyenne du solde migratoire pour la Suisse entre 2002 et 2017?",
+    text = "Quel est, selon vous, la valeur du solde migratoire pour la Suisse entre 2002 et 2017?\n\nLe solde migratoire étant la différence entre l'immigration et l'émigration.\n\nNote: Les chiffres de la migration n'inclue pas les données des demandes d'asile.\n\ Pour vous aider, en 2017, la population Suisse se situait à 8.4 Mio et 1% est égal à 84\'000",
     closeOnEsc = FALSE,
     closeOnClickOutside = FALSE,
     html = FALSE,
     type = "input",
-    inputType = "text",
+    inputType = "numeric",
     inputValue = "",
-    inputPlaceholder = "En pourcentage",
+    inputPlaceholder = "En pourcentage de la population totale Suisse",
     showConfirmButton = TRUE,
     showCancelButton = FALSE,
     confirmButtonText = "OK",
@@ -60,14 +60,14 @@ shinyServer(function(input, output) {
   observeEvent(TRUE, {
     shinyalert(
       title = "Deuxième Question",
-      text = "A votre avis, quel devrait être le solde migratoire en Suisse pour l'avenir?",
+      text = "A votre avis, quel devrait être le pourcentage du solde migratoire en Suisse pour les années à venir?",
       closeOnEsc = FALSE,
       closeOnClickOutside = FALSE,
       html = FALSE,
       type = "input",
-      inputType = "text",
+      inputType = "numeric",
       inputValue = "",
-      inputPlaceholder = "En pourcentage",
+      inputPlaceholder = "En pourcentage de la population totale Suisse",
       showConfirmButton = TRUE,
       showCancelButton = FALSE,
       confirmButtonText = "OK",
@@ -83,6 +83,10 @@ shinyServer(function(input, output) {
   wish_callback <- function(value) {
     my_wish(as.numeric(value))
   }
+  url <- a("Lien github avec le code source et les données", href="https://github.com/uthink-git")
+  output$tab <- renderUI({
+    tagList("", url)
+  })
   
   output$migration_plot <- renderPlot({
     
@@ -118,6 +122,14 @@ shinyServer(function(input, output) {
      gg = gg + scale_linetype_manual(name = "limit", values = c(2, 2), 
                             guide = guide_legend(override.aes = list(color = c("red", "blue"))))
      
+    } else if(input$migrationType != 'Immigration' & input$migrationType != 'Emigration' & input$`Absolue ou Pourcentage` == 'absolue') {
+      
+      my_mean_absolute = my_mean() * (sum(population_tot_suisse[which(years %in% input$annees)])/length(input$annees)) / 100
+      my_wish_absolute = my_wish() * (sum(population_tot_suisse[which(years %in% input$annees)])/length(input$annees)) / 100
+      gg = gg + geom_hline(aes(yintercept= my_mean_absolute, linetype = "Votre moyenne prédite entre 2002 et 2017"), colour= 'red')
+      gg = gg + geom_hline(aes(yintercept= my_wish_absolute, linetype = "Votre souhait de solde migratoire"), colour= 'blue')
+      gg = gg + scale_linetype_manual(name = "limit", values = c(2, 2), 
+                                      guide = guide_legend(override.aes = list(color = c("red", "blue"))))
     }
     
     gg = gg + scale_x_continuous(breaks = years, name = 'Année')

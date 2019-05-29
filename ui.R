@@ -45,7 +45,12 @@ shinyUI(fluidPage(
       selectInput('TypeGraphe',
                    label = 'Type de graphique',
                    choices = c('Surface','Bar plot'),
-                   selected = 'Surface')
+                   selected = 'Surface'),
+      helpText("Définitions:"),
+      helpText("Emigration: Nombre de personnes venant vivre en Suisse depuis l'étranger"),
+      helpText("Immigration: Nombre de personnes vivant en Suisse allant vivre à l'étranger"),
+      helpText("Solde migratoire: L'addition de l'immigration et l'émigration."),
+      uiOutput("tab")
     ),
     
     
