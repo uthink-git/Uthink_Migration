@@ -83,7 +83,7 @@ shinyServer(function(input, output) {
   wish_callback <- function(value) {
     my_wish(as.numeric(value))
   }
-  url <- a("Lien github avec le code source et les données", href="https://github.com/uthink-git")
+  url <- a("Lien github avec le code source et les données", href="https://github.com/uthink-git/Uthink_Migration")
   output$tab <- renderUI({
     tagList("", url)
   })
